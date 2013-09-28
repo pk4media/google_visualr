@@ -41,13 +41,16 @@ module GoogleVisualr
       js  = "\n<script type='text/javascript'>"
       js << "\n  google.load('visualization','1', {packages: ['#{package_name}']});"
       js << "\n  google.setOnLoadCallback(#{chart_function_name(element_id)});"
-      js << "\n  function #{chart_function_name(element_id)}() {"
+      js << "\n  function #{chart_function_name(element_id)}(width, height) {"
+      js << "\n    var options = #{js_parameters(@options)};"
+      js << "\n    if (typeof width == 'number') options['width'] = width;"
+      js << "\n    if (typeof height == 'number') options['height'] = height;"
       js << "\n    #{@data_table.to_js}"
       js << "\n    var chart = new google.visualization.#{chart_name}(document.getElementById('#{element_id}'));"
       @listeners.each do |listener|
         js << "\n    google.visualization.events.addListener(chart, '#{listener[:event]}', #{listener[:callback]});"
       end
-      js << "\n    chart.draw(data_table, #{js_parameters(@options)});"
+      js << "\n    chart.draw(data_table, options);"
       js << "\n  };"
       js << "\n</script>"
       js
